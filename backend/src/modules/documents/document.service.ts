@@ -10,11 +10,17 @@ import { cloudinary } from '../../config/cloudinary';
 import { env } from '../../config/env';
 import { logger } from '../../config/logger';
 
-const STORAGE_DIR = path.join(process.cwd(), 'storage', 'documents');
+const STORAGE_DIR = process.env.VERCEL
+  ? path.join('/tmp', 'storage', 'documents')
+  : path.join(process.cwd(), 'storage', 'documents');
 
 // Ensure secure private storage directory exists
-if (!fs.existsSync(STORAGE_DIR)) {
-  fs.mkdirSync(STORAGE_DIR, { recursive: true });
+try {
+  if (!fs.existsSync(STORAGE_DIR)) {
+    fs.mkdirSync(STORAGE_DIR, { recursive: true });
+  }
+} catch (dirErr) {
+  logger.warn('Storage directory initialization bypassed (read-only filesystem)');
 }
 
 const uploadToCloudinary = (
@@ -106,8 +112,15 @@ export class DocumentService {
     const storageKey = `${documentId}_${Date.now()}.${validation.detectedExtension}`;
     const destinationPath = path.join(STORAGE_DIR, storageKey);
 
-    // 5. Write File to Private Local Storage
-    fs.writeFileSync(destinationPath, file.buffer);
+    // 5. Write File to Private Local Storage (if filesystem allows)
+    try {
+      if (!fs.existsSync(STORAGE_DIR)) {
+        fs.mkdirSync(STORAGE_DIR, { recursive: true });
+      }
+      fs.writeFileSync(destinationPath, file.buffer);
+    } catch (writeErr) {
+      logger.warn('Could not write document to local disk (serverless ephemeral environment):', writeErr);
+    }
 
     // 5b. Upload to Cloudinary if credentials configured
     let cloudinaryResult: { secure_url: string; public_id: string } | null = null;

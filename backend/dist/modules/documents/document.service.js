@@ -14,9 +14,16 @@ const appError_1 = require("../../utils/appError");
 const cloudinary_1 = require("../../config/cloudinary");
 const env_1 = require("../../config/env");
 const logger_1 = require("../../config/logger");
-const STORAGE_DIR = path_1.default.join(process.cwd(), 'storage', 'documents');
-if (!fs_1.default.existsSync(STORAGE_DIR)) {
-    fs_1.default.mkdirSync(STORAGE_DIR, { recursive: true });
+const STORAGE_DIR = process.env.VERCEL
+    ? path_1.default.join('/tmp', 'storage', 'documents')
+    : path_1.default.join(process.cwd(), 'storage', 'documents');
+try {
+    if (!fs_1.default.existsSync(STORAGE_DIR)) {
+        fs_1.default.mkdirSync(STORAGE_DIR, { recursive: true });
+    }
+}
+catch (dirErr) {
+    logger_1.logger.warn('Storage directory initialization bypassed (read-only filesystem)');
 }
 const uploadToCloudinary = (buffer, publicId, extension, mimeType) => {
     const isImage = mimeType.startsWith('image/');
@@ -77,7 +84,15 @@ class DocumentService {
         const documentId = `DOC-${year}-${randomSuffix}`;
         const storageKey = `${documentId}_${Date.now()}.${validation.detectedExtension}`;
         const destinationPath = path_1.default.join(STORAGE_DIR, storageKey);
-        fs_1.default.writeFileSync(destinationPath, file.buffer);
+        try {
+            if (!fs_1.default.existsSync(STORAGE_DIR)) {
+                fs_1.default.mkdirSync(STORAGE_DIR, { recursive: true });
+            }
+            fs_1.default.writeFileSync(destinationPath, file.buffer);
+        }
+        catch (writeErr) {
+            logger_1.logger.warn('Could not write document to local disk (serverless ephemeral environment):', writeErr);
+        }
         let cloudinaryResult = null;
         if (env_1.env.CLOUDINARY_CLOUD_NAME && env_1.env.CLOUDINARY_API_KEY && env_1.env.CLOUDINARY_API_SECRET) {
             try {
