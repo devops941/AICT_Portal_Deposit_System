@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const institution_controller_1 = require("./institution.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const institution_validation_1 = require("./institution.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:READ'), institution_controller_1.institutionController.getInstitutions);
+router.post('/', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:CREATE'), (0, validate_middleware_1.validateRequest)(institution_validation_1.createInstitutionSchema), institution_controller_1.institutionController.createInstitution);
+router.get('/:id', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:READ'), (0, validate_middleware_1.validateRequest)(institution_validation_1.institutionIdParamSchema), institution_controller_1.institutionController.getInstitutionById);
+router.patch('/:id', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:UPDATE'), (0, validate_middleware_1.validateRequest)(institution_validation_1.updateInstitutionSchema), institution_controller_1.institutionController.updateInstitution);
+router.patch('/:id/status', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:UPDATE'), (0, validate_middleware_1.validateRequest)(institution_validation_1.updateStatusSchema), institution_controller_1.institutionController.updateStatus);
+router.patch('/:id/verify', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:VERIFY'), (0, validate_middleware_1.validateRequest)(institution_validation_1.verifyInstitutionSchema), institution_controller_1.institutionController.verifyInstitution);
+router.post('/:id/documents', (0, auth_middleware_1.authorizePermissions)('INSTITUTIONS:UPDATE'), (0, validate_middleware_1.validateRequest)(institution_validation_1.addDocumentSchema), institution_controller_1.institutionController.addDocument);
+router.get('/:id/users', (0, auth_middleware_1.authorizePermissions)('USERS:READ'), (0, validate_middleware_1.validateRequest)(institution_validation_1.institutionIdParamSchema), institution_controller_1.institutionController.getInstitutionUsers);
+exports.default = router;

@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const reports_controller_1 = require("./reports.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/fdrs', (req, res, next) => reports_controller_1.reportsController.getFdrsReport(req, res, next));
+router.get('/maturity', (req, res, next) => reports_controller_1.reportsController.getMaturityReport(req, res, next));
+router.get('/renewals', (req, res, next) => reports_controller_1.reportsController.getRenewalsReport(req, res, next));
+router.get('/releases', (req, res, next) => reports_controller_1.reportsController.getReleasesReport(req, res, next));
+router.get('/compliance', (req, res, next) => reports_controller_1.reportsController.getComplianceReport(req, res, next));
+router.get('/discrepancies', (req, res, next) => reports_controller_1.reportsController.getDiscrepanciesReport(req, res, next));
+router.get('/audit', (req, res, next) => reports_controller_1.reportsController.getAuditActivityReport(req, res, next));
+exports.default = router;

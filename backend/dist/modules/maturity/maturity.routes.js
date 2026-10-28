@@ -1,0 +1,13 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const maturity_controller_1 = require("./maturity.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', maturity_controller_1.maturityController.list);
+router.get('/metrics', maturity_controller_1.maturityController.getMetrics);
+router.get('/calendar', maturity_controller_1.maturityController.getCalendar);
+router.get('/alerts', maturity_controller_1.maturityController.getAlerts);
+router.post('/run-job', maturity_controller_1.maturityController.runJob);
+exports.default = router;

@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const notification_controller_1 = require("./notification.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.post('/send', (req, res, next) => notification_controller_1.notificationController.send(req, res, next));
+router.get('/', (req, res, next) => notification_controller_1.notificationController.list(req, res, next));
+router.patch('/:id/read', (req, res, next) => notification_controller_1.notificationController.markAsRead(req, res, next));
+router.patch('/read-all', (req, res, next) => notification_controller_1.notificationController.markAllAsRead(req, res, next));
+router.post('/retry', (req, res, next) => notification_controller_1.notificationController.retryFailed(req, res, next));
+router.get('/preferences', (req, res, next) => notification_controller_1.notificationController.getPreferences(req, res, next));
+router.put('/preferences', (req, res, next) => notification_controller_1.notificationController.updatePreferences(req, res, next));
+exports.default = router;

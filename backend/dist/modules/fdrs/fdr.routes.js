@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const fdr_controller_1 = require("./fdr.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const fdr_validation_1 = require("./fdr.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/metrics', (0, auth_middleware_1.authorizePermissions)('FDR:READ'), fdr_controller_1.fdrController.getDashboardMetrics);
+router.get('/', (0, auth_middleware_1.authorizePermissions)('FDR:READ'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.fdrQuerySchema), fdr_controller_1.fdrController.getFdrs);
+router.post('/', (0, auth_middleware_1.authorizePermissions)('FDR:CREATE'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.createFdrSchema), fdr_controller_1.fdrController.createFdr);
+router.get('/:id', (0, auth_middleware_1.authorizePermissions)('FDR:READ'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.fdrIdParamSchema), fdr_controller_1.fdrController.getFdrById);
+router.patch('/:id', (0, auth_middleware_1.authorizePermissions)('FDR:UPDATE'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.updateFdrSchema), fdr_controller_1.fdrController.updateFdr);
+router.post('/:id/submit', (0, auth_middleware_1.authorizePermissions)('FDR:SUBMIT'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.fdrIdParamSchema), fdr_controller_1.fdrController.submitFdr);
+router.get('/:id/history', (0, auth_middleware_1.authorizePermissions)('FDR:READ'), (0, validate_middleware_1.validateRequest)(fdr_validation_1.fdrIdParamSchema), fdr_controller_1.fdrController.getFdrHistory);
+exports.default = router;

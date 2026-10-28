@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const verification_controller_1 = require("./verification.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const verification_validation_1 = require("./verification.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/pending', verification_controller_1.verificationController.pending);
+router.get('/:id', verification_controller_1.verificationController.getPacket);
+router.post('/:id/verify', (0, validate_middleware_1.validate)(verification_validation_1.verifyFdrSchema), verification_controller_1.verificationController.verify);
+router.post('/:id/reject', (0, validate_middleware_1.validate)(verification_validation_1.rejectVerificationSchema), verification_controller_1.verificationController.reject);
+router.post('/:id/clarification', (0, validate_middleware_1.validate)(verification_validation_1.requestClarificationSchema), verification_controller_1.verificationController.requestClarification);
+router.get('/:id/history', verification_controller_1.verificationController.history);
+exports.default = router;

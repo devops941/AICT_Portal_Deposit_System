@@ -1,0 +1,10 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const health_controller_1 = require("./health.controller");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const health_validation_1 = require("./health.validation");
+const router = (0, express_1.Router)();
+router.get('/', health_controller_1.healthController.checkQuick);
+router.get('/system', (0, validate_middleware_1.validateRequest)(health_validation_1.healthQuerySchema), health_controller_1.healthController.checkSystem);
+exports.default = router;

@@ -1,0 +1,17 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const approval_controller_1 = require("./approval.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const approval_validation_1 = require("./approval.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', approval_controller_1.approvalController.list);
+router.post('/', (0, validate_middleware_1.validate)(approval_validation_1.createApprovalSchema), approval_controller_1.approvalController.create);
+router.get('/:id', approval_controller_1.approvalController.getById);
+router.post('/:id/approve', (0, validate_middleware_1.validate)(approval_validation_1.approveStepSchema), approval_controller_1.approvalController.approve);
+router.post('/:id/reject', (0, validate_middleware_1.validate)(approval_validation_1.rejectStepSchema), approval_controller_1.approvalController.reject);
+router.post('/:id/return', (0, validate_middleware_1.validate)(approval_validation_1.returnStepSchema), approval_controller_1.approvalController.returnStep);
+router.post('/:id/escalate', (0, validate_middleware_1.validate)(approval_validation_1.escalateStepSchema), approval_controller_1.approvalController.escalate);
+exports.default = router;

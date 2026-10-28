@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.permissionsRouter = exports.rolesRouter = void 0;
+const express_1 = require("express");
+const rbac_controller_1 = require("./rbac.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const rbac_validation_1 = require("./rbac.validation");
+exports.rolesRouter = (0, express_1.Router)();
+exports.permissionsRouter = (0, express_1.Router)();
+exports.rolesRouter.use(auth_middleware_1.authenticateToken);
+exports.rolesRouter.get('/', (0, auth_middleware_1.authorizePermissions)('ROLES:READ'), rbac_controller_1.rbacController.getRoles);
+exports.rolesRouter.post('/', (0, auth_middleware_1.authorizePermissions)('ROLES:CREATE'), (0, validate_middleware_1.validateRequest)(rbac_validation_1.createRoleSchema), rbac_controller_1.rbacController.createRole);
+exports.rolesRouter.patch('/:id', (0, auth_middleware_1.authorizePermissions)('ROLES:UPDATE'), (0, validate_middleware_1.validateRequest)(rbac_validation_1.updateRoleSchema), rbac_controller_1.rbacController.updateRole);
+exports.permissionsRouter.use(auth_middleware_1.authenticateToken);
+exports.permissionsRouter.get('/', (0, auth_middleware_1.authorizePermissions)('ROLES:READ'), rbac_controller_1.rbacController.getPermissions);

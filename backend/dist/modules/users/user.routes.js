@@ -1,0 +1,15 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const user_controller_1 = require("./user.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const user_validation_1 = require("./user.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', (0, auth_middleware_1.authorizePermissions)('USERS:READ'), (0, validate_middleware_1.validateRequest)(user_validation_1.userListQuerySchema), user_controller_1.userController.getUsers);
+router.post('/', (0, auth_middleware_1.authorizePermissions)('USERS:CREATE'), (0, validate_middleware_1.validateRequest)(user_validation_1.createUserSchema), user_controller_1.userController.createUser);
+router.get('/:id', (0, auth_middleware_1.authorizePermissions)('USERS:READ'), (0, validate_middleware_1.validateRequest)(user_validation_1.userIdParamSchema), user_controller_1.userController.getUserById);
+router.patch('/:id', (0, auth_middleware_1.authorizePermissions)('USERS:UPDATE'), (0, validate_middleware_1.validateRequest)(user_validation_1.updateUserSchema), user_controller_1.userController.updateUser);
+router.patch('/:id/status', (0, auth_middleware_1.authorizePermissions)('USERS:UPDATE'), (0, validate_middleware_1.validateRequest)(user_validation_1.updateUserStatusSchema), user_controller_1.userController.updateUserStatus);
+exports.default = router;

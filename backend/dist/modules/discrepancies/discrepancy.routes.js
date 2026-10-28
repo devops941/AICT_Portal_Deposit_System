@@ -1,0 +1,14 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const discrepancy_controller_1 = require("./discrepancy.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const discrepancy_validation_1 = require("./discrepancy.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', discrepancy_controller_1.discrepancyController.list);
+router.post('/', (0, validate_middleware_1.validate)(discrepancy_validation_1.createDiscrepancySchema), discrepancy_controller_1.discrepancyController.create);
+router.patch('/:id/resolve', (0, validate_middleware_1.validate)(discrepancy_validation_1.resolveDiscrepancySchema), discrepancy_controller_1.discrepancyController.resolve);
+router.get('/instrument/:instrumentId', discrepancy_controller_1.discrepancyController.getByInstrument);
+exports.default = router;

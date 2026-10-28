@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const renewal_controller_1 = require("./renewal.controller");
+const auth_middleware_1 = require("../../middleware/auth.middleware");
+const validate_middleware_1 = require("../../middleware/validate.middleware");
+const renewal_validation_1 = require("./renewal.validation");
+const router = (0, express_1.Router)();
+router.use(auth_middleware_1.authenticateToken);
+router.get('/', renewal_controller_1.renewalController.list);
+router.post('/', (0, validate_middleware_1.validateRequest)(renewal_validation_1.createRenewalSchema), renewal_controller_1.renewalController.create);
+router.get('/lineage/:instrumentId', renewal_controller_1.renewalController.getLineage);
+router.get('/:id', renewal_controller_1.renewalController.getById);
+router.post('/:id/submit', (0, validate_middleware_1.validateRequest)(renewal_validation_1.submitRenewalSchema), renewal_controller_1.renewalController.submit);
+router.post('/:id/approve', (0, validate_middleware_1.validateRequest)(renewal_validation_1.approveRenewalSchema), renewal_controller_1.renewalController.approve);
+exports.default = router;
