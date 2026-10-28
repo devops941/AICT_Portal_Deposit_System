@@ -1,7 +1,14 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { ApiResponseEnvelope } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+// Normalize API Base URL: strip trailing slashes, and ensure /api path is present when pointing to remote host
+let envBaseUrl = (import.meta.env.VITE_API_BASE_URL || '/api').trim();
+envBaseUrl = envBaseUrl.replace(/\/+$/, '');
+if (envBaseUrl.startsWith('http') && !envBaseUrl.endsWith('/api')) {
+  envBaseUrl = `${envBaseUrl}/api`;
+}
+
+export const API_BASE_URL = envBaseUrl;
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
