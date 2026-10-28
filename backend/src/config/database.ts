@@ -17,6 +17,12 @@ export const dbState: DatabaseState = {
 };
 
 export async function connectDatabase(): Promise<void> {
+  // If already connected or connecting (crucial for Vercel serverless pooling)
+  if (mongoose.connection.readyState >= 1) {
+    dbState.isConnected = true;
+    return;
+  }
+
   const mongooseOptions: mongoose.ConnectOptions = {
     autoIndex: env.NODE_ENV !== 'production',
     serverSelectionTimeoutMS: 5000,

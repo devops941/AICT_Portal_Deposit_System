@@ -12,10 +12,10 @@ const app: Application = express();
 // Security HTTP headers
 app.use(helmet());
 
-// Enable CORS
+// Enable CORS for all allowed web clients (including localhost and Vercel domains)
 app.use(
   cors({
-    origin: env.CLIENT_URL,
+    origin: true,
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
@@ -29,8 +29,18 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // HTTP Request logging
 app.use(httpLogger);
 
+// Root ping and health check
+app.get(['/', '/health'], (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    message: 'AICTE Security Deposit & FDR Lifecycle Backend API is running live',
+    timestamp: new Date().toISOString(),
+  });
+});
+
 // API Routes
 app.use('/api', routes);
+app.use('/', routes);
 
 // 404 handler
 app.use(notFoundHandler);
