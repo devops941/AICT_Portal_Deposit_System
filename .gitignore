@@ -5,6 +5,7 @@ node_modules/
 .pnp.js
 
 # Production Builds
+dist/
 frontend/dist/
 build/
 **/build/
