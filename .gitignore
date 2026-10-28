@@ -1,26 +1,34 @@
 # Dependencies
 node_modules/
+**/node_modules/
 .pnp
 .pnp.js
 
 # Production Builds
 dist/
+**/dist/
 build/
+**/build/
 out/
+**/out/
 
 # Environment Variables
 .env
+**/.env
 .env.local
+**/.env.local
 .env.development.local
 .env.test.local
 .env.production.local
 !.env.example
+!**/.env.example
 
 # Local storage and generated files
 storage/documents/*
 !storage/documents/.gitkeep
 backend/storage/documents/*
 !backend/storage/documents/.gitkeep
+*.pdf
 
 # Debug and Logs
 npm-debug.log*
@@ -48,5 +56,6 @@ coverage/
 tmp/
 temp/
 scratch/
+**/scratch/
 backend/scratch/
 .system_generated/
