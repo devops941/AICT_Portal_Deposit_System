@@ -20,6 +20,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import { apiClient as api } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 
 type ReportCategory =
   | 'FDRS'
@@ -31,6 +32,14 @@ type ReportCategory =
   | 'AUDIT';
 
 export const ReportsPage: React.FC = () => {
+  const { hasPermission, hasRole, user } = useAuth();
+  const canExport = hasPermission('REPORTS:EXPORT') || user?.userType === 'ADMIN';
+  const canViewAudit =
+    hasRole('AUDITOR') ||
+    hasRole('SYSTEM_ADMINISTRATOR') ||
+    hasPermission('AUDIT:READ') ||
+    user?.userType === 'ADMIN';
+
   const [activeCategory, setActiveCategory] = useState<ReportCategory>('FDRS');
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
@@ -244,22 +253,26 @@ export const ReportsPage: React.FC = () => {
 
         {/* Export Controls */}
         <div className="flex items-center gap-2">
-          <button
-            onClick={() => handleExport('csv')}
-            disabled={exporting || loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 shadow-sm transition-colors disabled:opacity-50"
-          >
-            <Download className="w-3.5 h-3.5 text-indigo-600" />
-            <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
-          </button>
-          <button
-            onClick={() => handleExport('excel')}
-            disabled={exporting || loading}
-            className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 shadow-sm transition-colors disabled:opacity-50"
-          >
-            <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Export Excel</span>
-          </button>
+          {canExport && (
+            <>
+              <button
+                onClick={() => handleExport('csv')}
+                disabled={exporting || loading}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 shadow-sm transition-colors disabled:opacity-50"
+              >
+                <Download className="w-3.5 h-3.5 text-indigo-600" />
+                <span>{exporting ? 'Exporting...' : 'Export CSV'}</span>
+              </button>
+              <button
+                onClick={() => handleExport('excel')}
+                disabled={exporting || loading}
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold rounded-xl border border-slate-300 shadow-sm transition-colors disabled:opacity-50"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Export Excel</span>
+              </button>
+            </>
+          )}
           <button
             onClick={handlePrint}
             className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold rounded-xl shadow-sm transition-colors"
@@ -344,17 +357,19 @@ export const ReportsPage: React.FC = () => {
           <span>Discrepancy Log</span>
         </button>
 
-        <button
-          onClick={() => handleCategoryChange('AUDIT')}
-          className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
-            activeCategory === 'AUDIT'
-              ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
-              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-          }`}
-        >
-          <History className="w-3.5 h-3.5" />
-          <span>Audit Activity Trail</span>
-        </button>
+        {canViewAudit && (
+          <button
+            onClick={() => handleCategoryChange('AUDIT')}
+            className={`px-3.5 py-2 rounded-xl transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeCategory === 'AUDIT'
+                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30'
+                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+            }`}
+          >
+            <History className="w-3.5 h-3.5" />
+            <span>Audit Activity Trail</span>
+          </button>
+        )}
       </div>
 
       {/* Filter Bar */}

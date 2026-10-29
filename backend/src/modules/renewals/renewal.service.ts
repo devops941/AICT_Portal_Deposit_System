@@ -178,9 +178,11 @@ export class RenewalService {
     const isOfficer =
       user.userType === 'ADMIN' ||
       user.roles.includes('SYSTEM_ADMINISTRATOR') ||
+      user.roles.includes('APPROVING_AUTHORITY') ||
+      user.roles.includes('SENIOR_VERIFICATION_OFFICER') ||
+      user.roles.includes('VERIFICATION_OFFICER') ||
       user.roles.includes('AICTE_OFFICER') ||
-      user.roles.includes('FINANCE_OFFICER') ||
-      user.roles.includes('APPROVING_AUTHORITY');
+      user.roles.includes('FINANCE_OFFICER');
 
     if (!isOfficer) {
       throw AppError.forbidden('Only authorized AICTE officers can approve renewals');

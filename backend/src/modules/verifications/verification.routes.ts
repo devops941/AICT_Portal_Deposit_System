@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { verificationController } from './verification.controller';
-import { authenticateToken } from '../../middleware/auth.middleware';
+import { authenticateToken, authorizeRoles } from '../../middleware/auth.middleware';
 import { validate } from '../../middleware/validate.middleware';
 import {
   verifyFdrSchema,
@@ -11,6 +11,15 @@ import {
 const router = Router();
 
 router.use(authenticateToken);
+// Restrict all verification desk endpoints to AICTE Officers & Admins
+router.use(
+  authorizeRoles(
+    'SYSTEM_ADMINISTRATOR',
+    'VERIFICATION_OFFICER',
+    'SENIOR_VERIFICATION_OFFICER',
+    'APPROVING_AUTHORITY'
+  )
+);
 
 // Pending verifications queue
 router.get('/pending', verificationController.pending);

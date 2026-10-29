@@ -23,12 +23,13 @@ import { RenewalsPage } from '../features/renewals/RenewalsPage';
 import { ReleasesPage } from '../features/releases/ReleasesPage';
 import { AiIntelligencePage } from '../features/ai/AiIntelligencePage';
 import { ReportsPage } from '../features/reports/ReportsPage';
+import { HomePage } from '../features/landing/HomePage';
 
 export const router = createBrowserRouter([
-  // Default entry route redirects to /login
+  // Public Landing / Home Page
   {
     path: '/',
-    element: <Navigate to="/login" replace />,
+    element: <HomePage />,
   },
 
   // Auth Layout (Public authentication routes)
@@ -121,7 +122,14 @@ export const router = createBrowserRouter([
       {
         path: '/verifications',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute
+            allowedRoles={[
+              'SYSTEM_ADMINISTRATOR',
+              'VERIFICATION_OFFICER',
+              'SENIOR_VERIFICATION_OFFICER',
+              'APPROVING_AUTHORITY',
+            ]}
+          >
             <VerificationsPage />
           </ProtectedRoute>
         ),
@@ -129,7 +137,14 @@ export const router = createBrowserRouter([
       {
         path: '/verifications/:fdrId',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute
+            allowedRoles={[
+              'SYSTEM_ADMINISTRATOR',
+              'VERIFICATION_OFFICER',
+              'SENIOR_VERIFICATION_OFFICER',
+              'APPROVING_AUTHORITY',
+            ]}
+          >
             <VerificationScrutinyPage />
           </ProtectedRoute>
         ),
@@ -137,7 +152,14 @@ export const router = createBrowserRouter([
       {
         path: '/approvals',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute
+            allowedRoles={[
+              'SYSTEM_ADMINISTRATOR',
+              'APPROVING_AUTHORITY',
+              'SENIOR_VERIFICATION_OFFICER',
+              'VERIFICATION_OFFICER',
+            ]}
+          >
             <ApprovalsPage />
           </ProtectedRoute>
         ),
@@ -145,7 +167,14 @@ export const router = createBrowserRouter([
       {
         path: '/approvals/:approvalId',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute
+            allowedRoles={[
+              'SYSTEM_ADMINISTRATOR',
+              'APPROVING_AUTHORITY',
+              'SENIOR_VERIFICATION_OFFICER',
+              'VERIFICATION_OFFICER',
+            ]}
+          >
             <ApprovalReviewPage />
           </ProtectedRoute>
         ),
@@ -153,7 +182,14 @@ export const router = createBrowserRouter([
       {
         path: '/approvals/review/:approvalId',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute
+            allowedRoles={[
+              'SYSTEM_ADMINISTRATOR',
+              'APPROVING_AUTHORITY',
+              'SENIOR_VERIFICATION_OFFICER',
+              'VERIFICATION_OFFICER',
+            ]}
+          >
             <ApprovalReviewPage />
           </ProtectedRoute>
         ),
@@ -161,7 +197,7 @@ export const router = createBrowserRouter([
       {
         path: '/maturity',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermissions={['FDR:READ']}>
             <MaturityDashboardPage />
           </ProtectedRoute>
         ),
@@ -169,7 +205,7 @@ export const router = createBrowserRouter([
       {
         path: '/renewals',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermissions={['FDR:READ']}>
             <RenewalsPage />
           </ProtectedRoute>
         ),
@@ -177,7 +213,7 @@ export const router = createBrowserRouter([
       {
         path: '/releases',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermissions={['FDR:READ']}>
             <ReleasesPage />
           </ProtectedRoute>
         ),
@@ -185,7 +221,7 @@ export const router = createBrowserRouter([
       {
         path: '/ai-intelligence',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermissions={['FDR:READ']}>
             <AiIntelligencePage />
           </ProtectedRoute>
         ),
@@ -193,7 +229,7 @@ export const router = createBrowserRouter([
       {
         path: '/reports',
         element: (
-          <ProtectedRoute>
+          <ProtectedRoute requiredPermissions={['REPORTS:READ']}>
             <ReportsPage />
           </ProtectedRoute>
         ),

@@ -18,6 +18,7 @@ import {
   Check,
 } from 'lucide-react';
 import { apiClient as api } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 import {
   VerificationPacket,
   VerificationChecklistItem,
@@ -33,6 +34,24 @@ import { ChecklistStatusConfirmModal } from './ChecklistStatusConfirmModal';
 export const VerificationScrutinyPage: React.FC = () => {
   const { fdrId } = useParams<{ fdrId: string }>();
   const navigate = useNavigate();
+  const { hasRole, hasPermission, user } = useAuth();
+
+  const canVerify =
+    hasPermission('FDR:VERIFY') ||
+    hasPermission('DEPOSITS:VERIFY') ||
+    hasRole('VERIFICATION_OFFICER') ||
+    hasRole('SENIOR_VERIFICATION_OFFICER') ||
+    hasRole('APPROVING_AUTHORITY') ||
+    hasRole('SYSTEM_ADMINISTRATOR') ||
+    user?.userType === 'ADMIN';
+
+  const canReject =
+    hasPermission('FDR:REJECT') ||
+    hasPermission('DEPOSITS:REJECT') ||
+    hasRole('SENIOR_VERIFICATION_OFFICER') ||
+    hasRole('APPROVING_AUTHORITY') ||
+    hasRole('SYSTEM_ADMINISTRATOR') ||
+    user?.userType === 'ADMIN';
 
   const [packet, setPacket] = useState<VerificationPacket | null>(null);
   const [checklist, setChecklist] = useState<VerificationChecklistItem[]>([]);
@@ -704,18 +723,26 @@ export const VerificationScrutinyPage: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-3 self-end sm:self-auto">
+              {!canVerify && (
+                <span className="text-xs font-semibold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
+                  Read-only Scrutiny Mode (Officer role required)
+                </span>
+              )}
+
               <button
                 type="button"
+                disabled={!canVerify}
                 onClick={() => setIsClarificationOpen(true)}
-                className="px-4 py-2 text-sm font-semibold text-purple-700 bg-purple-50 border border-purple-200 hover:bg-purple-100 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 text-sm font-semibold text-purple-700 bg-purple-50 border border-purple-200 hover:bg-purple-100 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <MessageSquareQuote className="w-4 h-4" /> Request Clarification
               </button>
 
               <button
                 type="button"
+                disabled={!canReject}
                 onClick={() => setIsRejecting(true)}
-                className="px-4 py-2 text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm"
+                className="px-4 py-2 text-sm font-semibold text-rose-700 bg-rose-50 border border-rose-200 hover:bg-rose-100 rounded-xl transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <XCircle className="w-4 h-4" /> Reject
               </button>
@@ -723,8 +750,8 @@ export const VerificationScrutinyPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleVerifyFdr}
-                disabled={isVerifying || !allPassed}
-                className="px-6 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={isVerifying || !allPassed || !canVerify}
+                className="px-6 py-2 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md transition-colors flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 {isVerifying ? 'Verifying...' : 'Verify & Approve for Workflow'}

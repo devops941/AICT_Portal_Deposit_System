@@ -18,6 +18,7 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import { apiClient as api } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 import {
   MaturityItem,
   MaturityOverviewMetrics,
@@ -27,6 +28,9 @@ import {
 
 export const MaturityDashboardPage: React.FC = () => {
   const navigate = useNavigate();
+  const { hasRole, user } = useAuth();
+  const canRunJob = hasRole('SYSTEM_ADMINISTRATOR') || user?.userType === 'ADMIN';
+
   const [activeTab, setActiveTab] = useState<'UPCOMING' | 'CALENDAR' | 'ALERTS'>('UPCOMING');
   const [windowFilter, setWindowFilter] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -210,20 +214,22 @@ export const MaturityDashboardPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={handleRunJob}
-            disabled={isScanning}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
-          >
-            {isScanning ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
-            ) : (
-              <Play className="w-4 h-4 fill-white" />
-            )}
-            <span>{isScanning ? 'Running Scrutiny Job...' : 'Run Maturity Scan'}</span>
-          </button>
-        </div>
+        {canRunJob && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRunJob}
+              disabled={isScanning}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
+            >
+              {isScanning ? (
+                <RefreshCw className="w-4 h-4 animate-spin" />
+              ) : (
+                <Play className="w-4 h-4 fill-white" />
+              )}
+              <span>{isScanning ? 'Running Scrutiny Job...' : 'Run Maturity Scan'}</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Scan notification banner */}

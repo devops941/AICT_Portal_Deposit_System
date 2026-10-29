@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Eye,
@@ -9,6 +9,7 @@ import {
   Check,
   Sparkles,
   Lock,
+  ArrowLeft,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -53,6 +54,18 @@ export const LoginPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  useEffect(() => {
+    const prefilled = (location.state as any)?.prefilledEmail;
+    if (prefilled) {
+      setEmail(prefilled);
+      const foundIdx = demoRoles.findIndex((r) => r.email === prefilled);
+      if (foundIdx !== -1) {
+        setActiveRoleIndex(foundIdx);
+        setPassword(demoRoles[foundIdx].password);
+      }
+    }
+  }, [location.state]);
+
   const from = (location.state as any)?.from?.pathname || '/dashboard';
 
   const handleSelectRole = (r: (typeof demoRoles)[0], idx: number) => {
@@ -82,15 +95,25 @@ export const LoginPage: React.FC = () => {
       {/* Left Column: Login Form & Information */}
       <div className="lg:col-span-7 p-7 sm:p-10 md:p-12 lg:p-14 flex flex-col justify-between">
         <div className="space-y-6">
-          {/* Brand Pill matching design reference */}
-          <div className="flex items-center gap-2.5">
-            <div className="w-2.5 h-6 rounded-full bg-[#6d3bee]" />
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-900 text-sm tracking-tight">AICTE Portal</span>
-              <span className="text-[10px] font-semibold text-[#6d3bee] bg-[#6d3bee]/10 px-2 py-0.5 rounded-full">
-                Security Deposit
-              </span>
+          {/* Top Bar with Brand Pill & Back to Home */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2.5">
+              <div className="w-2.5 h-6 rounded-full bg-[#6d3bee]" />
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-slate-900 text-sm tracking-tight">AICTE Portal</span>
+                <span className="text-[10px] font-semibold text-[#6d3bee] bg-[#6d3bee]/10 px-2 py-0.5 rounded-full">
+                  Security Deposit
+                </span>
+              </div>
             </div>
+
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-indigo-600 transition-colors bg-slate-50 hover:bg-indigo-50 px-3 py-1.5 rounded-lg border border-slate-200/60"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Home</span>
+            </Link>
           </div>
 
           {/* Greeting Typography */}

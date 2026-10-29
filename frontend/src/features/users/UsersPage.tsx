@@ -42,6 +42,7 @@ interface RoleItem {
 
 export const UsersPage: React.FC = () => {
   const { hasPermission, user: currentUser } = useAuth();
+  const canUpdate = hasPermission('USERS:UPDATE');
 
   const [users, setUsers] = useState<UserItem[]>([]);
   const [roles, setRoles] = useState<RoleItem[]>([]);
@@ -345,45 +346,49 @@ export const UsersPage: React.FC = () => {
 
                       {/* Actions */}
                       <td className="py-4 px-6 text-right relative">
-                        <div className="relative inline-block text-left" ref={isActiveMenu ? menuRef : undefined}>
-                          <button
-                            onClick={() => setActiveMenuId(isActiveMenu ? null : u.id)}
-                            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-                            title="Actions"
-                          >
-                            <MoreVertical className="w-4 h-4" />
-                          </button>
+                        {canUpdate ? (
+                          <div className="relative inline-block text-left" ref={isActiveMenu ? menuRef : undefined}>
+                            <button
+                              onClick={() => setActiveMenuId(isActiveMenu ? null : u.id)}
+                              className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+                              title="Actions"
+                            >
+                              <MoreVertical className="w-4 h-4" />
+                            </button>
 
-                          {isActiveMenu && (
-                            <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-200/80 py-1 z-30 animate-in fade-in zoom-in-95 duration-100">
-                              <button
-                                onClick={() => openEditModal(u)}
-                                className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
-                              >
-                                <Edit2 className="w-3.5 h-3.5 text-slate-400" />
-                                <span>Edit Details</span>
-                              </button>
+                            {isActiveMenu && (
+                              <div className="absolute right-0 mt-1 w-44 bg-white rounded-xl shadow-lg border border-slate-200/80 py-1 z-30 animate-in fade-in zoom-in-95 duration-100">
+                                <button
+                                  onClick={() => openEditModal(u)}
+                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 flex items-center gap-2"
+                                >
+                                  <Edit2 className="w-3.5 h-3.5 text-slate-400" />
+                                  <span>Edit Details</span>
+                                </button>
 
-                              {u.status === 'ACTIVE' ? (
-                                <button
-                                  onClick={() => handleUpdateStatus(u, 'INACTIVE')}
-                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
-                                >
-                                  <XCircle className="w-3.5 h-3.5" />
-                                  <span>Deactivate User</span>
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleUpdateStatus(u, 'ACTIVE')}
-                                  className="w-full text-left px-3.5 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2"
-                                >
-                                  <CheckCircle2 className="w-3.5 h-3.5" />
-                                  <span>Activate User</span>
-                                </button>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                                {u.status === 'ACTIVE' ? (
+                                  <button
+                                    onClick={() => handleUpdateStatus(u, 'INACTIVE')}
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                                  >
+                                    <XCircle className="w-3.5 h-3.5" />
+                                    <span>Deactivate User</span>
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={() => handleUpdateStatus(u, 'ACTIVE')}
+                                    className="w-full text-left px-3.5 py-2 text-xs font-medium text-emerald-600 hover:bg-emerald-50 flex items-center gap-2"
+                                  >
+                                    <CheckCircle2 className="w-3.5 h-3.5" />
+                                    <span>Activate User</span>
+                                  </button>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-[11px] font-medium text-slate-400 italic">Read-only</span>
+                        )}
                       </td>
                     </tr>
                   );

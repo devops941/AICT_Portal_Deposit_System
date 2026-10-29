@@ -16,11 +16,21 @@ import {
   Lock,
 } from 'lucide-react';
 import { apiClient as api } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 import { ReleaseItem, ReleaseMetrics } from './types';
 import { CreateReleaseModal } from './CreateReleaseModal';
 import { ReleaseDetailsModal } from './ReleaseDetailsModal';
 
 export const ReleasesPage: React.FC = () => {
+  const { hasPermission, hasRole, user } = useAuth();
+  const canCreateRelease =
+    hasPermission('DEPOSITS:SUBMIT') ||
+    hasPermission('FDR:SUBMIT') ||
+    hasRole('INSTITUTION_ADMIN') ||
+    hasRole('INSTITUTION_STAFF') ||
+    hasRole('SYSTEM_ADMINISTRATOR') ||
+    user?.userType === 'ADMIN';
+
   const [searchParams] = useSearchParams();
   const [releases, setReleases] = useState<ReleaseItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -162,15 +172,17 @@ export const ReleasesPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Release Request</span>
-          </button>
-        </div>
+        {canCreateRelease && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Release Request</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Metrics Row */}

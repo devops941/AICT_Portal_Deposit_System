@@ -15,11 +15,21 @@ import {
   FileCheck,
 } from 'lucide-react';
 import { apiClient as api } from '../../services/apiClient';
+import { useAuth } from '../../context/AuthContext';
 import { RenewalItem, RenewalStatus } from './types';
 import { CreateRenewalModal } from './CreateRenewalModal';
 import { RenewalDetailsModal } from './RenewalDetailsModal';
 
 export const RenewalsPage: React.FC = () => {
+  const { hasPermission, hasRole, user } = useAuth();
+  const canInitiate =
+    hasPermission('FDR:CREATE') ||
+    hasPermission('DEPOSITS:SUBMIT') ||
+    hasRole('INSTITUTION_ADMIN') ||
+    hasRole('INSTITUTION_STAFF') ||
+    hasRole('SYSTEM_ADMINISTRATOR') ||
+    user?.userType === 'ADMIN';
+
   const [searchParams] = useSearchParams();
   const [renewals, setRenewals] = useState<RenewalItem[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -132,15 +142,17 @@ export const RenewalsPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsCreateModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Initiate Renewal</span>
-          </button>
-        </div>
+        {canInitiate && (
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setIsCreateModalOpen(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-all shadow-sm shadow-indigo-600/30"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Initiate Renewal</span>
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Metrics Row */}

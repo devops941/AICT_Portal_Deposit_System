@@ -30,7 +30,7 @@ interface NavGroup {
 
 export const Sidebar: React.FC = () => {
   const navigate = useNavigate();
-  const { logout, hasPermission } = useAuth();
+  const { logout, hasPermission, hasRole } = useAuth();
 
   const handleLogout = async () => {
     await logout();
@@ -74,13 +74,24 @@ export const Sidebar: React.FC = () => {
           to: '/verifications',
           label: 'Verification Desk',
           icon: FileSearch,
-          show: hasPermission('FDR:READ') || hasPermission('DEPOSITS:READ'),
+          show:
+            hasRole('VERIFICATION_OFFICER') ||
+            hasRole('SENIOR_VERIFICATION_OFFICER') ||
+            hasRole('APPROVING_AUTHORITY') ||
+            hasRole('SYSTEM_ADMINISTRATOR') ||
+            hasPermission('DEPOSITS:VERIFY') ||
+            hasPermission('FDR:VERIFY'),
         },
         {
           to: '/approvals',
           label: 'Approval Center',
           icon: Award,
-          show: hasPermission('FDR:READ') || hasPermission('DEPOSITS:READ'),
+          show:
+            hasRole('APPROVING_AUTHORITY') ||
+            hasRole('SENIOR_VERIFICATION_OFFICER') ||
+            hasRole('SYSTEM_ADMINISTRATOR') ||
+            hasPermission('DEPOSITS:APPROVE') ||
+            hasPermission('FDR:APPROVE'),
         },
       ],
     },
@@ -91,19 +102,19 @@ export const Sidebar: React.FC = () => {
           to: '/maturity',
           label: 'Maturity Radar',
           icon: CalendarClock,
-          show: true,
+          show: hasPermission('FDR:READ') || hasPermission('DEPOSITS:READ'),
         },
         {
           to: '/renewals',
           label: 'Renewals & Lineage',
           icon: RotateCcw,
-          show: true,
+          show: hasPermission('FDR:READ') || hasPermission('DEPOSITS:READ'),
         },
         {
           to: '/releases',
           label: 'Releases & Refunds',
           icon: CreditCard,
-          show: true,
+          show: hasPermission('FDR:READ') || hasPermission('DEPOSITS:READ'),
         },
       ],
     },
@@ -114,7 +125,7 @@ export const Sidebar: React.FC = () => {
           to: '/reports',
           label: 'Statutory Reports',
           icon: FileSpreadsheet,
-          show: true,
+          show: hasPermission('REPORTS:READ'),
         },
       ],
     },

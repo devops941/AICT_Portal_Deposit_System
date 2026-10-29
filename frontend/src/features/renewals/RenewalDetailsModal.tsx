@@ -111,8 +111,10 @@ export const RenewalDetailsModal: React.FC<RenewalDetailsModalProps> = ({
   const isOfficer =
     user?.userType === 'ADMIN' ||
     user?.roles?.includes('SYSTEM_ADMINISTRATOR') ||
-    user?.roles?.includes('AICTE_OFFICER') ||
-    user?.roles?.includes('APPROVING_AUTHORITY');
+    user?.roles?.includes('APPROVING_AUTHORITY') ||
+    user?.roles?.includes('SENIOR_VERIFICATION_OFFICER') ||
+    user?.roles?.includes('VERIFICATION_OFFICER') ||
+    user?.roles?.includes('AICTE_OFFICER');
 
   const handleApprove = async () => {
     if (!approvalRemarks.trim()) {

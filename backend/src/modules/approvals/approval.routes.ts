@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { approvalController } from './approval.controller';
-import { authenticateToken } from '../../middleware/auth.middleware';
+import { authenticateToken, authorizeRoles } from '../../middleware/auth.middleware';
 import { validate } from '../../middleware/validate.middleware';
 import {
   createApprovalSchema,
@@ -13,6 +13,15 @@ import {
 const router = Router();
 
 router.use(authenticateToken);
+// Restrict all approval center actions to authorized workflow roles
+router.use(
+  authorizeRoles(
+    'SYSTEM_ADMINISTRATOR',
+    'APPROVING_AUTHORITY',
+    'SENIOR_VERIFICATION_OFFICER',
+    'VERIFICATION_OFFICER'
+  )
+);
 
 // List approvals & create approval
 router.get('/', approvalController.list);
