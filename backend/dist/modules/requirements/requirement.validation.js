@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.requirementQuerySchema = exports.verifyInstrumentSchema = exports.pledgeInstrumentSchema = exports.requirementIdParamSchema = exports.updateRequirementSchema = exports.createRequirementSchema = void 0;
+exports.requirementQuerySchema = exports.verifyInstrumentSchema = exports.pledgeInstrumentSchema = exports.requirementIdParamSchema = exports.updateRequirementSchema = exports.createRequirementSchema = exports.STATUTORY_MINIMUM_AMOUNTS = void 0;
 const zod_1 = require("zod");
 const requirementTypes = [
     'NEW_INSTITUTION_ESTABLISHMENT',
@@ -19,12 +19,21 @@ const complianceStatuses = [
     'OVERDUE',
     'UNDER_REVIEW',
 ];
+exports.STATUTORY_MINIMUM_AMOUNTS = {
+    NEW_INSTITUTION_ESTABLISHMENT: 5000000,
+    PROGRAM_EXPANSION: 2500000,
+    LAND_DEFICIENCY_ESCROW: 2000000,
+    ANNUAL_COMPLIANCE: 1500000,
+    ADDITIONAL_COURSE_INSPECTION: 1000000,
+    PENALTY_ESCROW: 500000,
+};
 const positiveDecimalSchema = zod_1.z.union([
     zod_1.z.number().positive('Amount must be greater than 0'),
     zod_1.z.string().regex(/^\d+(\.\d{1,2})?$/, 'Amount must be a valid positive financial decimal with up to 2 decimal places'),
 ]);
 exports.createRequirementSchema = {
-    body: zod_1.z.object({
+    body: zod_1.z
+        .object({
         requirementId: zod_1.z.string().trim().optional(),
         institutionId: zod_1.z.string().trim().min(1, 'Institution ID is required'),
         title: zod_1.z.string().trim().min(3, 'Title must be at least 3 characters').max(250, 'Title cannot exceed 250 characters'),
@@ -42,7 +51,15 @@ exports.createRequirementSchema = {
         acceptableInstrumentTypes: zod_1.z.array(zod_1.z.enum(instrumentTypes)).min(1, 'At least one acceptable instrument type is required'),
         supportingDocumentRequirements: zod_1.z.array(zod_1.z.string().trim()).optional().default([]),
         applicableBusinessRules: zod_1.z.array(zod_1.z.string().trim()).optional().default([]),
-    }),
+    })
+        .refine((data) => {
+        const minAmount = exports.STATUTORY_MINIMUM_AMOUNTS[data.requirementType] || 0;
+        const val = typeof data.requiredAmount === 'number' ? data.requiredAmount : parseFloat(data.requiredAmount);
+        return val >= minAmount;
+    }, (data) => ({
+        message: `Statutory Minimum Violation: Mandated deposit for ${data.requirementType} cannot be less than ₹${(exports.STATUTORY_MINIMUM_AMOUNTS[data.requirementType] || 0).toLocaleString('en-IN')}`,
+        path: ['requiredAmount'],
+    })),
 };
 exports.updateRequirementSchema = {
     params: zod_1.z.object({

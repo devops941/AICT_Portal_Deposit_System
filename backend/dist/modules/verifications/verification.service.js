@@ -189,7 +189,7 @@ class VerificationService {
         });
         const reqDoc = await Requirement_model_1.Requirement.findOne({ requirementId: fdr.requirementId });
         if (reqDoc) {
-            const pledged = reqDoc.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrId);
+            const pledged = reqDoc.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrId || p.instrumentId === fdr.fdrNumber);
             if (pledged) {
                 pledged.verificationStatus = 'VERIFIED';
                 pledged.remarks = `Verified by officer ${user.fullName}`;
@@ -232,7 +232,7 @@ class VerificationService {
         });
         const reqDoc = await Requirement_model_1.Requirement.findOne({ requirementId: fdr.requirementId });
         if (reqDoc) {
-            const pledged = reqDoc.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrId);
+            const pledged = reqDoc.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrId || p.instrumentId === fdr.fdrNumber);
             if (pledged) {
                 pledged.verificationStatus = 'REJECTED';
                 pledged.remarks = `Rejected: ${input.remarks}`;

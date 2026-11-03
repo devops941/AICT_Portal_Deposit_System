@@ -60,5 +60,6 @@ scratch/
 backend/scratch/
 .system_generated/
 *.tsbuildinfo
+*.zip
 
 docs

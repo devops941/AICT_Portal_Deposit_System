@@ -21,6 +21,16 @@ const complianceStatuses = [
   'UNDER_REVIEW',
 ] as const;
 
+// Statutory minimum deposit amounts mandated by AICTE
+export const STATUTORY_MINIMUM_AMOUNTS: Record<string, number> = {
+  NEW_INSTITUTION_ESTABLISHMENT: 5000000,
+  PROGRAM_EXPANSION: 2500000,
+  LAND_DEFICIENCY_ESCROW: 2000000,
+  ANNUAL_COMPLIANCE: 1500000,
+  ADDITIONAL_COURSE_INSPECTION: 1000000,
+  PENALTY_ESCROW: 500000,
+};
+
 // Validation for financial decimal string/number
 const positiveDecimalSchema = z.union([
   z.number().positive('Amount must be greater than 0'),
@@ -28,25 +38,39 @@ const positiveDecimalSchema = z.union([
 ]);
 
 export const createRequirementSchema = {
-  body: z.object({
-    requirementId: z.string().trim().optional(),
-    institutionId: z.string().trim().min(1, 'Institution ID is required'),
-    title: z.string().trim().min(3, 'Title must be at least 3 characters').max(250, 'Title cannot exceed 250 characters'),
-    requirementType: z.enum(requirementTypes, {
-      errorMap: () => ({ message: 'Invalid requirement type' }),
-    }),
-    requiredAmount: positiveDecimalSchema,
-    currency: z.string().trim().default('INR'),
-    effectiveDate: z.coerce.date().optional(),
-    submissionDeadline: z.coerce.date({
-      required_error: 'Submission deadline is required',
-      invalid_type_error: 'Invalid submission deadline date',
-    }),
-    applicableRuleReference: z.string().trim().min(1, 'Applicable rule reference is required'),
-    acceptableInstrumentTypes: z.array(z.enum(instrumentTypes)).min(1, 'At least one acceptable instrument type is required'),
-    supportingDocumentRequirements: z.array(z.string().trim()).optional().default([]),
-    applicableBusinessRules: z.array(z.string().trim()).optional().default([]),
-  }),
+  body: z
+    .object({
+      requirementId: z.string().trim().optional(),
+      institutionId: z.string().trim().min(1, 'Institution ID is required'),
+      title: z.string().trim().min(3, 'Title must be at least 3 characters').max(250, 'Title cannot exceed 250 characters'),
+      requirementType: z.enum(requirementTypes, {
+        errorMap: () => ({ message: 'Invalid requirement type' }),
+      }),
+      requiredAmount: positiveDecimalSchema,
+      currency: z.string().trim().default('INR'),
+      effectiveDate: z.coerce.date().optional(),
+      submissionDeadline: z.coerce.date({
+        required_error: 'Submission deadline is required',
+        invalid_type_error: 'Invalid submission deadline date',
+      }),
+      applicableRuleReference: z.string().trim().min(1, 'Applicable rule reference is required'),
+      acceptableInstrumentTypes: z.array(z.enum(instrumentTypes)).min(1, 'At least one acceptable instrument type is required'),
+      supportingDocumentRequirements: z.array(z.string().trim()).optional().default([]),
+      applicableBusinessRules: z.array(z.string().trim()).optional().default([]),
+    })
+    .refine(
+      (data) => {
+        const minAmount = STATUTORY_MINIMUM_AMOUNTS[data.requirementType] || 0;
+        const val = typeof data.requiredAmount === 'number' ? data.requiredAmount : parseFloat(data.requiredAmount);
+        return val >= minAmount;
+      },
+      (data) => ({
+        message: `Statutory Minimum Violation: Mandated deposit for ${data.requirementType} cannot be less than ₹${(
+          STATUTORY_MINIMUM_AMOUNTS[data.requirementType] || 0
+        ).toLocaleString('en-IN')}`,
+        path: ['requiredAmount'],
+      })
+    ),
 };
 
 export const updateRequirementSchema = {

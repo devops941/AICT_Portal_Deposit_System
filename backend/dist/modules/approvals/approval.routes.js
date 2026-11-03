@@ -7,6 +7,7 @@ const validate_middleware_1 = require("../../middleware/validate.middleware");
 const approval_validation_1 = require("./approval.validation");
 const router = (0, express_1.Router)();
 router.use(auth_middleware_1.authenticateToken);
+router.use((0, auth_middleware_1.authorizeRoles)('SYSTEM_ADMINISTRATOR', 'APPROVING_AUTHORITY', 'SENIOR_VERIFICATION_OFFICER', 'VERIFICATION_OFFICER'));
 router.get('/', approval_controller_1.approvalController.list);
 router.post('/', (0, validate_middleware_1.validate)(approval_validation_1.createApprovalSchema), approval_controller_1.approvalController.create);
 router.get('/:id', approval_controller_1.approvalController.getById);

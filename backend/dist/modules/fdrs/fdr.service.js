@@ -223,10 +223,10 @@ class FdrService {
             });
             if (!requirement)
                 return;
-            const existing = requirement.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrNumber || p.instrumentId === fdr.fdrId);
+            const existing = requirement.pledgedInstruments.find((p) => p.instrumentId === fdr.fdrId || p.instrumentId === fdr.fdrNumber);
             if (!existing) {
                 requirement.pledgedInstruments.push({
-                    instrumentId: fdr.fdrNumber,
+                    instrumentId: fdr.fdrId,
                     instrumentType: fdr.instrumentType,
                     bankName: fdr.bankName,
                     branchName: fdr.bankBranch,

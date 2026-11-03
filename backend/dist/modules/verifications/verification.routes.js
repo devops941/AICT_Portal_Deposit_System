@@ -7,6 +7,7 @@ const validate_middleware_1 = require("../../middleware/validate.middleware");
 const verification_validation_1 = require("./verification.validation");
 const router = (0, express_1.Router)();
 router.use(auth_middleware_1.authenticateToken);
+router.use((0, auth_middleware_1.authorizeRoles)('SYSTEM_ADMINISTRATOR', 'VERIFICATION_OFFICER', 'SENIOR_VERIFICATION_OFFICER', 'APPROVING_AUTHORITY'));
 router.get('/pending', verification_controller_1.verificationController.pending);
 router.get('/:id', verification_controller_1.verificationController.getPacket);
 router.post('/:id/verify', (0, validate_middleware_1.validate)(verification_validation_1.verifyFdrSchema), verification_controller_1.verificationController.verify);
