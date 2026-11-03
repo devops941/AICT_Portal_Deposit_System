@@ -119,7 +119,7 @@ export const LoginPage: React.FC = () => {
           {/* Greeting Typography */}
           <div className="space-y-1.5 pt-1">
             <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight leading-tight">
-              Holla,<br />
+              Hello,<br />
               <span className="text-slate-900">Welcome Back</span>
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 font-medium pt-1">
